@@ -1,5 +1,8 @@
 # ThreatDesk - SOC Management Platform
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+
 Web-based Security Operations Center (SOC) alert management platform for collecting, normalizing, triaging, escalating, and reporting security alerts from multiple sources.
 
 ## Project Structure
@@ -399,7 +402,7 @@ cat frontend/.env
 
 ## License
 
-Proprietary - ThreatDesk Security Operations Center
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
