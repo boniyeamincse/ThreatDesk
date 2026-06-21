@@ -3,6 +3,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { AlertsModule } from './modules/alerts/alerts.module';
+import { IncidentsModule } from './modules/incidents/incidents.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
@@ -14,6 +15,7 @@ import { SettingsModule } from './modules/settings/settings.module';
     AuthModule,
     UsersModule,
     AlertsModule,
+    IncidentsModule,
     DashboardModule,
     TicketsModule,
     IntegrationsModule,

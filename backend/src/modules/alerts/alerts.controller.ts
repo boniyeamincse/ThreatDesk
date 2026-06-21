@@ -137,4 +137,9 @@ export class AlertsController {
   getRelatedAlerts(@Param('id') id: string, @Query('limit') limit?: string) {
     return this.alertsService.getRelatedAlerts(id, limit ? parseInt(limit) : 5);
   }
+
+  @Post(':id/create-incident')
+  createIncident(@Param('id') id: string, @Body() data: any) {
+    return this.alertsService.createIncidentFromAlert(id, data);
+  }
 }

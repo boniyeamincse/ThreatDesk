@@ -359,4 +359,31 @@ export class AlertsService {
       orderBy: { firstName: 'asc' },
     });
   }
+
+  async createIncidentFromAlert(alertId: string, incidentData: any) {
+    const alert = await this.findOne(alertId);
+
+    const incident = await this.prisma.incident.create({
+      data: {
+        title: incidentData.title || `Incident from ${alert.name}`,
+        description: incidentData.description || alert.description,
+        severity: alert.severity,
+        status: 'investigating',
+        owner: incidentData.owner,
+      },
+    });
+
+    await this.prisma.ticket.create({
+      data: {
+        incidentId: incident.id,
+        alertId,
+        title: `Alert: ${alert.name}`,
+        description: alert.description,
+        severity: alert.severity,
+        status: 'open',
+      },
+    });
+
+    return incident;
+  }
 }
