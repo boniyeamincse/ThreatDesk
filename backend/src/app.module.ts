@@ -13,6 +13,7 @@ import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { LogSourcesModule } from './modules/log-sources/log-sources.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { WebsocketModule } from './websocket/websocket.module';
+import { JobsModule } from './modules/jobs/jobs.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { WebsocketModule } from './websocket/websocket.module';
     LogSourcesModule,
     NotificationsModule,
     WebsocketModule,
+    JobsModule,
   ],
 })
 export class AppModule {}
