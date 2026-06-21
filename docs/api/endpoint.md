@@ -1886,6 +1886,72 @@ Replace all role permissions.
 
 ---
 
+## Notifications API
+
+#### GET /notifications
+List all notifications with pagination.
+
+**Query Parameters:**
+- `skip` (optional): Offset (default: 0)
+- `take` (optional): Limit (default: 20)
+
+**Response:**
+```json
+{
+  "notifications": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "title": "New Critical Alert",
+      "message": "Suspicious PowerShell detected on PC-IT-01",
+      "type": "alert.created",
+      "relatedId": "alert-id",
+      "read": false,
+      "createdAt": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "total": 150,
+  "limit": 20
+}
+```
+
+#### GET /notifications/unread
+Get unread notifications only.
+
+#### POST /notifications/:id/read
+Mark single notification as read.
+
+#### POST /notifications/read-all
+Mark all notifications as read for current user.
+
+#### DELETE /notifications/:id
+Delete notification.
+
+#### GET /notifications/summary/daily
+Get daily summary with counts.
+
+**Response:**
+```json
+{
+  "date": "2024-01-15",
+  "alertsCreated": 42,
+  "incidentsCreated": 3,
+  "ticketsCreated": 15,
+  "recentNotifications": [...]
+}
+```
+
+**Notification Types:**
+- alert.created/escalated/assigned/closed
+- ticket.created/updated
+- incident.created/updated
+- sla.breached
+- logsource.disconnected
+
+**Channels:** In-app, Email, Slack, Teams
+
+---
+
 ## Error Responses
 
 All errors return standard format:
