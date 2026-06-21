@@ -37,14 +37,44 @@ model User {
   password  String
   firstName String
   lastName  String
+  phone     String?
   department String?
   roleId    String
   role      Role     @relation(fields: [roleId], references: [id])
   active    Boolean  @default(true)
+  mfaEnabled Boolean @default(false)
+  mfaSecret String?
   alerts    AlertAssignment[]
   comments  AlertComment[]
+  preferences UserPreferences?
+  apiKeys   ApiKey[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model UserPreferences {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailAlerts     Boolean  @default(true)
+  emailSeverity   String[] @default(["critical", "high"])
+  slackAlerts     Boolean  @default(false)
+  slackWebhook    String?
+  dailySummary    Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ApiKey {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  key       String   @unique
+  lastUsedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 // ============= Core Alert System =============

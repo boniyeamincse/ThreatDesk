@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, ShieldAlert, Ticket, Network, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShieldAlert, Ticket, Network, Settings, LogOut } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Alerts', href: '/alerts', icon: ShieldAlert },
   { name: 'Tickets', href: '/tickets', icon: Ticket },
   { name: 'Integrations', href: '/integrations', icon: Network },
+  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 export default function Sidebar() {

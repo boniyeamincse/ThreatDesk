@@ -6,6 +6,7 @@ import { AlertsModule } from './modules/alerts/alerts.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
     DashboardModule,
     TicketsModule,
     IntegrationsModule,
+    SettingsModule,
   ],
 })
 export class AppModule {}
