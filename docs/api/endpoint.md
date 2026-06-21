@@ -260,6 +260,297 @@ Delete user. **Admin required.**
 
 ---
 
+## Alerts API
+
+### Alert CRUD
+
+#### GET /alerts
+List alerts with filtering and pagination.
+
+**Query Parameters:**
+- `skip` (optional): Offset for pagination (default: 0)
+- `take` (optional): Limit results (default: 20)
+- `severity` (optional): Filter by severity (critical, high, medium, low)
+- `status` (optional): Filter by status (new, in_progress, escalated, closed, archived)
+- `source` (optional): Filter by source (wazuh, deep-security, firewall, etc.)
+
+**Response:**
+```json
+{
+  "alerts": [
+    {
+      "id": "uuid",
+      "alertCode": "ALERT-001",
+      "name": "Suspicious Login",
+      "severity": "high",
+      "status": "new",
+      "verdict": "unclassified",
+      "source": "wazuh",
+      "alertTime": "2024-01-15T10:30:00Z",
+      "asset": { "id": "uuid", "hostname": "prod-web-01" },
+      "assignedTo": []
+    }
+  ],
+  "total": 150,
+  "page": 0,
+  "limit": 20
+}
+```
+
+#### POST /alerts
+Create new alert.
+
+**Request Body:**
+```json
+{
+  "source": "wazuh",
+  "name": "Suspicious Activity",
+  "description": "High number of login failures",
+  "severity": "high",
+  "alertTime": "2024-01-15T10:30:00Z",
+  "eventTime": "2024-01-15T10:25:00Z",
+  "assetId": "uuid",
+  "sourceIp": "192.168.1.100",
+  "destinationIp": "10.0.0.1",
+  "destinationPort": 22,
+  "protocol": "ssh",
+  "ruleId": "rule-123"
+}
+```
+
+#### GET /alerts/:id
+Get alert details with comments, timeline, and related data.
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "alertCode": "ALERT-001",
+  "name": "Suspicious Login",
+  "severity": "high",
+  "status": "in_progress",
+  "verdict": "true_positive",
+  "asset": { "id": "uuid", "hostname": "prod-web-01" },
+  "assignedTo": [{ "id": "uuid", "user": {...} }],
+  "comments": [...],
+  "timeline": [...],
+  "tickets": [...]
+}
+```
+
+#### DELETE /alerts/:id
+Delete alert and associated data (comments, assignments, timeline).
+
+---
+
+### Alert Workflow
+
+#### POST /alerts/:id/assign
+Assign alert to analyst.
+
+**Request Body:**
+```json
+{
+  "userId": "uuid"
+}
+```
+
+#### POST /alerts/:id/unassign
+Remove analyst assignment.
+
+**Request Body:**
+```json
+{
+  "userId": "uuid"
+}
+```
+
+#### POST /alerts/:id/start
+Begin investigation (sets status to in_progress).
+
+#### POST /alerts/:id/close
+Close alert.
+
+**Request Body:**
+```json
+{
+  "reason": "False positive - legitimate admin activity"
+}
+```
+
+#### POST /alerts/:id/archive
+Archive alert (removes from active view).
+
+#### POST /alerts/:id/reopen
+Reopen closed alert.
+
+#### POST /alerts/:id/escalate
+Escalate to L2 responder.
+
+**Request Body:**
+```json
+{
+  "reason": "Potential APT activity - needs deep investigation"
+}
+```
+
+---
+
+### Alert Classification
+
+#### PATCH /alerts/:id/status
+Update alert status.
+
+**Request Body:**
+```json
+{
+  "status": "in_progress"
+}
+```
+
+**Valid statuses:** new, in_progress, escalated, closed, archived
+
+#### PATCH /alerts/:id/severity
+Update severity level.
+
+**Request Body:**
+```json
+{
+  "severity": "critical"
+}
+```
+
+**Valid severities:** low, medium, high, critical
+
+#### PATCH /alerts/:id/verdict
+Set verdict classification.
+
+**Request Body:**
+```json
+{
+  "verdict": "true_positive"
+}
+```
+
+**Valid verdicts:** unclassified, true_positive, false_positive, suspicious, benign
+
+#### PATCH /alerts/:id/priority-score
+Set custom priority score.
+
+**Request Body:**
+```json
+{
+  "priorityScore": 85
+}
+```
+
+---
+
+### Alert Comments
+
+#### GET /alerts/:id/comments
+Get all comments for alert.
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "content": "Initial assessment complete",
+    "user": {
+      "id": "uuid",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john@example.com"
+    },
+    "createdAt": "2024-01-15T11:00:00Z",
+    "updatedAt": "2024-01-15T11:00:00Z"
+  }
+]
+```
+
+#### POST /alerts/:id/comments
+Add comment to alert.
+
+**Request Body:**
+```json
+{
+  "content": "Confirmed malicious IP. Blocking in firewall."
+}
+```
+
+#### PUT /alerts/:id/comments/:commentId
+Edit your own comment.
+
+**Request Body:**
+```json
+{
+  "content": "Updated analysis..."
+}
+```
+
+#### DELETE /alerts/:id/comments/:commentId
+Delete your own comment.
+
+---
+
+### Alert Context
+
+#### GET /alerts/:id/timeline
+Get alert activity timeline.
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "action": "escalated",
+    "details": "Escalated to L2. Reason: Potential APT",
+    "createdAt": "2024-01-15T11:30:00Z"
+  },
+  {
+    "id": "uuid",
+    "action": "assigned",
+    "details": "Assigned to user xyz",
+    "createdAt": "2024-01-15T11:15:00Z"
+  }
+]
+```
+
+#### GET /alerts/:id/raw-event
+Get raw event data from source system.
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "alertCode": "ALERT-001",
+  "rawEvent": { ...original event payload... }
+}
+```
+
+#### GET /alerts/:id/related-alerts
+Get similar alerts on same asset.
+
+**Query Parameters:**
+- `limit` (optional): Number of results (default: 5)
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Failed SSH Login",
+    "severity": "medium",
+    "status": "closed",
+    "alertTime": "2024-01-15T09:00:00Z",
+    "asset": { "id": "uuid", "hostname": "prod-web-01" }
+  }
+]
+```
+
+---
+
 ## Dashboard API
 
 ### GET /dashboard/summary
