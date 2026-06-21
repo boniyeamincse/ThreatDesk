@@ -702,6 +702,252 @@ Get all alerts with assignments (team workload view).
 
 ---
 
+## Incidents API
+
+### Incident CRUD
+
+#### GET /incidents
+List incidents with filtering and pagination.
+
+**Query Parameters:**
+- `skip` (optional): Offset for pagination (default: 0)
+- `take` (optional): Limit results (default: 20)
+- `severity` (optional): Filter by severity
+- `status` (optional): Filter by status
+
+**Response:**
+```json
+{
+  "incidents": [
+    {
+      "id": "uuid",
+      "incidentCode": "INC-001",
+      "title": "Ransomware Attack - Finance System",
+      "description": "Multiple systems encrypted, ransom demand received",
+      "severity": "critical",
+      "status": "investigating",
+      "owner": "user-id",
+      "createdAt": "2024-01-15T10:30:00Z",
+      "updatedAt": "2024-01-15T11:00:00Z",
+      "tickets": []
+    }
+  ],
+  "total": 5,
+  "page": 0,
+  "limit": 20
+}
+```
+
+#### POST /incidents
+Create incident.
+
+**Request Body:**
+```json
+{
+  "title": "Security Incident",
+  "description": "Detailed description of incident",
+  "severity": "critical",
+  "owner": "user-id (optional)"
+}
+```
+
+#### GET /incidents/:id
+Get incident details.
+
+**Response:** Full incident object with tickets
+
+#### PATCH /incidents/:id
+Update incident.
+
+**Request Body:**
+```json
+{
+  "title": "Updated title",
+  "description": "Updated description",
+  "severity": "high",
+  "owner": "new-owner-id"
+}
+```
+
+#### DELETE /incidents/:id
+Delete incident and related tickets.
+
+---
+
+### Incident Workflow
+
+#### POST /incidents/:id/assign
+Assign incident to owner.
+
+**Request Body:**
+```json
+{
+  "owner": "user-id"
+}
+```
+
+#### PATCH /incidents/:id/status
+Update incident status.
+
+**Request Body:**
+```json
+{
+  "status": "investigating"
+}
+```
+
+**Valid statuses:** open, investigating, contained, remediated, recovered, closed, reopened
+
+#### POST /incidents/:id/contain
+Mark incident as contained.
+
+**Request Body:**
+```json
+{
+  "details": "Isolated affected systems from network"
+}
+```
+
+#### POST /incidents/:id/remediate
+Mark incident as remediated.
+
+**Request Body:**
+```json
+{
+  "details": "Removed malware, patched systems"
+}
+```
+
+#### POST /incidents/:id/recover
+Mark incident as recovered.
+
+**Request Body:**
+```json
+{
+  "details": "Systems restored from clean backups"
+}
+```
+
+#### POST /incidents/:id/close
+Close incident.
+
+**Request Body:**
+```json
+{
+  "details": "Post-incident review completed"
+}
+```
+
+#### POST /incidents/:id/reopen
+Reopen closed incident.
+
+**Request Body:**
+```json
+{
+  "reason": "Additional indicators of compromise discovered"
+}
+```
+
+---
+
+### Incident-Alert Relationships
+
+#### POST /incidents/:id/alerts
+Add alert to incident.
+
+**Request Body:**
+```json
+{
+  "alertId": "uuid"
+}
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "incidentId": "uuid",
+  "alertId": "uuid",
+  "title": "Alert: Suspicious Activity",
+  "severity": "high",
+  "status": "open"
+}
+```
+
+#### GET /incidents/:id/alerts
+Get all alerts linked to incident.
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "incidentId": "uuid",
+    "alertId": "uuid",
+    "title": "Alert: Suspicious Activity",
+    "severity": "high",
+    "alert": { ...alert object... },
+    "comments": [...]
+  }
+]
+```
+
+#### DELETE /incidents/:id/alerts/:alertId
+Remove alert from incident.
+
+---
+
+### Incident-Asset Relationships
+
+#### POST /incidents/:id/assets
+Add asset to incident.
+
+**Request Body:**
+```json
+{
+  "assetId": "uuid"
+}
+```
+
+#### GET /incidents/:id/assets
+Get all affected assets for incident.
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "hostname": "prod-web-01",
+    "ip": "10.0.0.5",
+    "criticality": "critical",
+    "assetType": "server"
+  }
+]
+```
+
+#### DELETE /incidents/:id/assets/:assetId
+Remove asset from incident.
+
+---
+
+### Create Incident from Alert
+
+#### POST /alerts/:id/create-incident
+Create incident from alert (links alert to new incident).
+
+**Request Body:**
+```json
+{
+  "title": "Custom incident title (optional)",
+  "description": "Custom description (optional)",
+  "owner": "user-id (optional)"
+}
+```
+
+**Response:** Created incident object
+
+---
+
 ## Dashboard API
 
 ### GET /dashboard/summary
