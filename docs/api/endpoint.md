@@ -1886,6 +1886,31 @@ Replace all role permissions.
 
 ---
 
+## Background Jobs
+
+Jobs run automatically on schedule. No API endpoints. Monitor via logs.
+
+**Scheduled Tasks:**
+
+| Job | Schedule | Purpose |
+|-----|----------|---------|
+| Wazuh Sync | Every 5 min | Pull alerts from Wazuh API |
+| SLA Breach Check | Every 1 min | Detect escalated alerts over 1h old |
+| Daily Report | 8 AM daily | Generate SOC summary (TP/FP counts) |
+| Alert Dedup | Every 10 min | Archive duplicate alerts by source:name:asset |
+| Health Check | Every 5 min | Monitor log sources, mark disconnected if >30m no sync |
+| Audit Cleanup | 1st of month | Delete audit logs > 90 days |
+| Alert Archive | 1st of month | Archive closed alerts > 60 days |
+
+**Features:**
+- Async execution (non-blocking)
+- Error logging & recovery
+- Event triggers on major actions
+- Integration with Notifications service
+- Automatic retry on failure
+
+---
+
 ## Notifications API
 
 #### GET /notifications
