@@ -551,6 +551,157 @@ Get similar alerts on same asset.
 
 ---
 
+## Alert Board API (Kanban)
+
+### GET /alert-board
+Get full alert board organized by Kanban columns.
+
+**Query Parameters:**
+- `severity` (optional): Filter by severity (critical, high, medium, low)
+- `source` (optional): Filter by source (wazuh, deep-security, etc)
+- `assignedTo` (optional): Filter by assigned user ID
+
+**Response:**
+```json
+{
+  "columns": [
+    {
+      "id": "new",
+      "title": "New",
+      "status": "new",
+      "alerts": [
+        {
+          "id": "uuid",
+          "alertCode": "ALERT-001",
+          "name": "Suspicious Login",
+          "severity": "high",
+          "alertTime": "2024-01-15T10:30:00Z",
+          "asset": { "id": "uuid", "hostname": "prod-web-01" },
+          "assignedTo": []
+        }
+      ]
+    },
+    {
+      "id": "in_progress",
+      "title": "In Progress",
+      "status": "in_progress",
+      "alerts": [...]
+    },
+    {
+      "id": "escalated",
+      "title": "Escalated",
+      "status": "escalated",
+      "alerts": [...]
+    },
+    {
+      "id": "closed",
+      "title": "Closed",
+      "status": "closed",
+      "alerts": [...]
+    },
+    {
+      "id": "archived",
+      "title": "Archived",
+      "status": "archived",
+      "alerts": [...]
+    }
+  ],
+  "total": 150
+}
+```
+
+### GET /alert-board/columns
+Get board column definitions.
+
+**Response:**
+```json
+[
+  { "id": "new", "title": "New", "status": "new" },
+  { "id": "in_progress", "title": "In Progress", "status": "in_progress" },
+  { "id": "escalated", "title": "Escalated", "status": "escalated" },
+  { "id": "closed", "title": "Closed", "status": "closed" },
+  { "id": "archived", "title": "Archived", "status": "archived" }
+]
+```
+
+### PATCH /alert-board/alerts/:id/move
+Move alert to different column (status).
+
+**Request Body:**
+```json
+{
+  "status": "in_progress"
+}
+```
+
+**Valid statuses:** new, in_progress, escalated, closed, archived
+
+**Response:** Updated alert object with new status
+
+**Errors:**
+- 400: Invalid status
+- 404: Alert not found
+
+### GET /alert-board/my-alerts
+Get all alerts assigned to current user.
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "alertCode": "ALERT-001",
+    "name": "Suspicious Login",
+    "severity": "high",
+    "status": "in_progress",
+    "verdict": "unclassified",
+    "alertTime": "2024-01-15T10:30:00Z",
+    "asset": { "id": "uuid", "hostname": "prod-web-01" },
+    "assignedTo": [
+      {
+        "id": "uuid",
+        "user": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john@example.com"
+        }
+      }
+    ]
+  }
+]
+```
+
+### GET /alert-board/team-alerts
+Get all alerts with assignments (team workload view).
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "alertCode": "ALERT-001",
+    "name": "Suspicious Activity",
+    "severity": "critical",
+    "status": "escalated",
+    "alertTime": "2024-01-15T10:30:00Z",
+    "assignedTo": [
+      {
+        "id": "uuid",
+        "user": {
+          "id": "user-uuid",
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john@example.com",
+          "role": { "name": "L1 Analyst" }
+        }
+      }
+    ]
+  }
+]
+```
+
+---
+
 ## Dashboard API
 
 ### GET /dashboard/summary
