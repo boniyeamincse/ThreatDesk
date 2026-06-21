@@ -61,25 +61,15 @@ export default function IntegrationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="flex items-center justify-between p-6 max-w-7xl mx-auto">
+    <div className="min-h-screen">
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Integrations</h1>
             <p className="text-gray-600 mt-1">Configure data source integrations</p>
           </div>
-          <a
-            href="/dashboard"
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition"
-          >
-            Back to Dashboard
-          </a>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
         {error && <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
 
         {loading ? (

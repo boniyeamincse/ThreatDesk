@@ -62,10 +62,6 @@ export default function DashboardPage() {
     fetchDashboard();
   }, [router]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    router.push('/login');
-  };
 
   if (loading) {
     return (
@@ -78,25 +74,13 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="flex items-center justify-between p-6 max-w-7xl mx-auto">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">ThreatDesk Dashboard</h1>
-            <p className="text-gray-600 mt-1">SOC Alert Management & Triage</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
-
+    <div className="min-h-screen">
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-1">SOC Alert Management & Triage Overview</p>
+        </div>
         {error && <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
 
         {summary && (
