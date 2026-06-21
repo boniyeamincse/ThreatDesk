@@ -1534,6 +1534,195 @@ Most frequently triggered rules.
 
 ---
 
+---
+
+## Users & Roles API
+
+### User Management
+
+#### GET /users
+List users with pagination.
+
+**Query Parameters:**
+- `skip` (optional): Offset (default: 0)
+- `take` (optional): Limit (default: 20)
+
+**Response:**
+```json
+{
+  "users": [
+    {
+      "id": "uuid",
+      "email": "john@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": "+1-555-0123",
+      "active": true,
+      "role": { "id": "uuid", "name": "Admin" },
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "total": 25,
+  "page": 0,
+  "limit": 20
+}
+```
+
+#### GET /users/:id
+Get user details with permissions.
+
+#### POST /users
+Create user.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1-555-0123",
+  "department": "SOC",
+  "role": "Admin",
+  "password": "CustomPass123! (optional)"
+}
+```
+
+#### PATCH /users/:id
+Update user.
+
+**Request Body:**
+```json
+{
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "phone": "+1-555-9876",
+  "department": "Security",
+  "role": "L1 Analyst"
+}
+```
+
+#### DELETE /users/:id
+Delete user.
+
+#### POST /users/:id/deactivate
+Deactivate user account.
+
+#### POST /users/:id/activate
+Reactivate user account.
+
+#### POST /users/:id/reset-password
+Generate temporary password.
+
+**Response:**
+```json
+{
+  "message": "Password reset. Send temp password to user.",
+  "tempPassword": "A1B2C3D4E5F6"
+}
+```
+
+---
+
+### Role Management
+
+#### GET /roles
+List all roles with permissions.
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Admin",
+    "description": "Full system access",
+    "permissions": [...]
+  }
+]
+```
+
+#### GET /roles/:id
+Get role with users and permissions.
+
+#### POST /roles
+Create role.
+
+**Request Body:**
+```json
+{
+  "name": "L2 Responder",
+  "description": "Escalated alert handling",
+  "permissions": ["perm-id-1", "perm-id-2"]
+}
+```
+
+#### PATCH /roles/:id
+Update role.
+
+**Request Body:**
+```json
+{
+  "name": "Updated Name",
+  "description": "Updated description"
+}
+```
+
+#### DELETE /roles/:id
+Delete role (fails if users assigned).
+
+---
+
+### Permission Management
+
+#### GET /permissions
+List all permissions.
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "view_alerts",
+    "description": "View security alerts"
+  }
+]
+```
+
+#### POST /permissions
+Create permission.
+
+**Request Body:**
+```json
+{
+  "name": "escalate_alerts",
+  "description": "Escalate alerts to L2"
+}
+```
+
+#### GET /roles/:roleId/permissions
+Get permissions for role.
+
+#### POST /roles/:roleId/permissions
+Add permissions to role.
+
+**Request Body:**
+```json
+{
+  "permissionIds": ["perm-id-1", "perm-id-2"]
+}
+```
+
+#### PUT /roles/:roleId/permissions
+Replace all role permissions.
+
+**Request Body:**
+```json
+{
+  "permissionIds": ["perm-id-1", "perm-id-2"]
+}
+```
+
+---
+
 ## Error Responses
 
 All errors return standard format:
