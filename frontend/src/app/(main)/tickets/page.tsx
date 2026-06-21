@@ -35,7 +35,7 @@ export default function TicketsPage() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
         setTickets(response.data.tickets);
       } catch (err) {
@@ -52,64 +52,67 @@ export default function TicketsPage() {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-500/20 text-red-400 border border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.2)]';
       case 'high':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-500/20 text-orange-400 border border-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.2)]';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 shadow-[0_0_10px_rgba(234,179,8,0.2)]';
       case 'low':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-500/20 text-green-400 border border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.2)]';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-slate-500/20 text-slate-400 border border-slate-500/50';
     }
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-slate-950 text-slate-300">
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Tickets</h1>
-            <p className="text-gray-600 mt-1">Track incidents and tickets</p>
+            <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+              <div className="h-8 w-1.5 bg-cyan-500 rounded-full shadow-[0_0_10px_rgba(6,182,212,0.8)]"></div>
+              Tickets
+            </h1>
+            <p className="text-slate-400 mt-2 text-sm ml-4">Track incidents and tickets</p>
           </div>
         </div>
-        {error && <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
+        {error && <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 text-red-400 rounded-lg shadow-lg flex items-center"><span className="mr-2">⚠</span> {error}</div>}
 
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-gray-600">Loading tickets...</p>
+            <p className="text-slate-400 animate-pulse">Loading tickets...</p>
           </div>
         ) : tickets.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-600 text-lg">No tickets found</p>
+          <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-xl shadow-2xl p-8 text-center">
+            <p className="text-slate-400 text-lg">No tickets found</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="w-full">
+          <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-xl shadow-2xl overflow-hidden">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gray-50 border-b">
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Ticket Code</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Title</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Severity</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Assigned Team</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Created</th>
+                <tr className="bg-slate-900 border-b border-slate-800">
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Ticket Code</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Title</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Severity</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Assigned Team</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Created</th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-slate-800/50">
                 {tickets.map((ticket) => (
-                  <tr key={ticket.id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 text-sm font-medium text-blue-600">{ticket.ticketCode}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900">{ticket.title}</td>
+                  <tr key={ticket.id} className="hover:bg-slate-800/50 transition duration-150">
+                    <td className="px-6 py-4 text-sm font-medium text-cyan-400">{ticket.ticketCode}</td>
+                    <td className="px-6 py-4 text-sm text-slate-200">{ticket.title}</td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getSeverityColor(ticket.severity)}`}>
                         {ticket.severity.toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 font-semibold">{ticket.status}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{ticket.assignedTeam || 'Unassigned'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-slate-300 font-semibold">{ticket.status.replace(/_/g, ' ')}</td>
+                    <td className="px-6 py-4 text-sm text-slate-400">{ticket.assignedTeam || 'Unassigned'}</td>
+                    <td className="px-6 py-4 text-sm text-slate-400">
                       {new Date(ticket.createdAt).toLocaleDateString()}
                     </td>
                   </tr>

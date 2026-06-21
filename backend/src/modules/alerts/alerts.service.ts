@@ -24,6 +24,46 @@ export class AlertsService {
       where.source = filters.source;
     }
 
+    if (filters.verdict) {
+      where.verdict = filters.verdict;
+    }
+
+    // Date/Time filtering
+    if (filters.startDate || filters.endDate) {
+      where.alertTime = {};
+
+      if (filters.startDate) {
+        const startDate = new Date(filters.startDate);
+        if (filters.startTime) {
+          const [hours, minutes] = filters.startTime.split(':');
+          startDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        } else {
+          startDate.setHours(0, 0, 0, 0);
+        }
+        where.alertTime.gte = startDate;
+      }
+
+      if (filters.endDate) {
+        const endDate = new Date(filters.endDate);
+        if (filters.endTime) {
+          const [hours, minutes] = filters.endTime.split(':');
+          endDate.setHours(parseInt(hours), parseInt(minutes), 59, 999);
+        } else {
+          endDate.setHours(23, 59, 59, 999);
+        }
+        where.alertTime.lte = endDate;
+      }
+    }
+
+    // Search by name/description
+    if (filters.search) {
+      where.OR = [
+        { name: { contains: filters.search, mode: 'insensitive' } },
+        { description: { contains: filters.search, mode: 'insensitive' } },
+        { alertCode: { contains: filters.search, mode: 'insensitive' } },
+      ];
+    }
+
     const [alerts, total] = await Promise.all([
       this.prisma.alert.findMany({
         where,

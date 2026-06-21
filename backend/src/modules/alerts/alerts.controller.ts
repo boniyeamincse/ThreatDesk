@@ -14,8 +14,24 @@ export class AlertsController {
     @Query('severity') severity?: string,
     @Query('status') status?: string,
     @Query('source') source?: string,
+    @Query('verdict') verdict?: string,
+    @Query('search') search?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('startTime') startTime?: string,
+    @Query('endTime') endTime?: string,
   ) {
-    const filters = { severity, status, source };
+    const filters = {
+      severity,
+      status,
+      source,
+      verdict,
+      search,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+    };
     return this.alertsService.findAll(parseInt(skip || '0'), parseInt(take || '20'), filters);
   }
 
