@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { X, Check, AlertCircle } from 'lucide-react';
 
 interface Integration {
   id: string;
@@ -12,40 +13,104 @@ interface Integration {
   lastSyncAt?: string;
 }
 
+interface WazuhConfig {
+  apiUrl: string;
+  user: string;
+  password: string;
+}
+
 export default function IntegrationsPage() {
   const router = useRouter();
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showWazuhModal, setShowWazuhModal] = useState(false);
+  const [wazuhConfig, setWazuhConfig] = useState<WazuhConfig>({
+    apiUrl: '',
+    user: '',
+    password: '',
+  });
+  const [testLoading, setTestLoading] = useState(false);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [saveLoading, setSaveLoading] = useState(false);
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
     if (!token) {
       router.push('/login');
       return;
     }
 
-    const fetchIntegrations = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/integrations`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        setIntegrations(response.data);
-      } catch (err) {
-        setError('Failed to load integrations');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchIntegrations();
-  }, [router]);
+  }, [router, token]);
+
+  const fetchIntegrations = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/api/integrations`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setIntegrations(response.data);
+    } catch (err) {
+      setError('Failed to load integrations');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadWazuhConfig = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/api/integrations/wazuh/config`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data) {
+        setWazuhConfig(response.data);
+      }
+    } catch (err) {
+      console.log('No existing Wazuh config');
+    }
+    setShowWazuhModal(true);
+  };
+
+  const testWazuhConnection = async () => {
+    try {
+      setTestLoading(true);
+      setTestResult(null);
+      const response = await axios.post(
+        `${apiUrl}/api/integrations/wazuh/test`,
+        wazuhConfig,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setTestResult(response.data);
+    } catch (err: any) {
+      setTestResult({
+        success: false,
+        message: err.response?.data?.message || 'Connection test failed',
+      });
+    } finally {
+      setTestLoading(false);
+    }
+  };
+
+  const saveWazuhConfig = async () => {
+    try {
+      setSaveLoading(true);
+      await axios.post(
+        `${apiUrl}/api/integrations/wazuh/config`,
+        wazuhConfig,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setError('');
+      setShowWazuhModal(false);
+      await fetchIntegrations();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to save config');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -86,7 +151,11 @@ export default function IntegrationsPage() {
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor('inactive')}`}>
                   Inactive
                 </span>
-                <button className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold">Configure</button>
+                <button
+                  onClick={loadWazuhConfig}
+                  className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold">
+                  Configure
+                </button>
               </div>
             </div>
 
@@ -182,6 +251,111 @@ export default function IntegrationsPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* Wazuh Config Modal */}
+        {showWazuhModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+              <div className="flex items-center justify-between p-6 border-b">
+                <h2 className="text-xl font-bold text-gray-900">Wazuh Configuration</h2>
+                <button
+                  onClick={() => setShowWazuhModal(false)}
+                  className="text-gray-500 hover:text-gray-700">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded flex gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-red-800">{error}</span>
+                  </div>
+                )}
+
+                {testResult && (
+                  <div
+                    className={`p-3 border rounded flex gap-2 ${
+                      testResult.success
+                        ? 'bg-green-50 border-green-200'
+                        : 'bg-red-50 border-red-200'
+                    }`}>
+                    {testResult.success ? (
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                    )}
+                    <span
+                      className={`text-sm ${
+                        testResult.success ? 'text-green-800' : 'text-red-800'
+                      }`}>
+                      {testResult.message}
+                    </span>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    API URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://wazuh-manager.example.com"
+                    value={wazuhConfig.apiUrl}
+                    onChange={(e) => setWazuhConfig({...wazuhConfig, apiUrl: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="admin"
+                    value={wazuhConfig.user}
+                    onChange={(e) => setWazuhConfig({...wazuhConfig, user: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={wazuhConfig.password}
+                    onChange={(e) => setWazuhConfig({...wazuhConfig, password: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 p-6 border-t bg-gray-50">
+                <button
+                  onClick={() => setShowWazuhModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium transition">
+                  Cancel
+                </button>
+                <button
+                  onClick={testWazuhConnection}
+                  disabled={testLoading || !wazuhConfig.apiUrl}
+                  className="flex-1 px-4 py-2 border border-indigo-300 bg-indigo-50 text-indigo-700 rounded-md hover:bg-indigo-100 font-medium transition disabled:opacity-50">
+                  {testLoading ? 'Testing...' : 'Test'}
+                </button>
+                <button
+                  onClick={saveWazuhConfig}
+                  disabled={saveLoading || !wazuhConfig.apiUrl || !wazuhConfig.user || !wazuhConfig.password}
+                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium transition disabled:opacity-50">
+                  {saveLoading ? 'Saving...' : 'Save'}
+                </button>
+              </div>
             </div>
           </div>
         )}

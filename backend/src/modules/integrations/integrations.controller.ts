@@ -22,6 +22,16 @@ export class IntegrationsController {
     return this.integrationsService.create(data);
   }
 
+  @Get('wazuh/config')
+  async getWazuhConfig() {
+    return this.integrationsService.getWazuhConfig();
+  }
+
+  @Post('wazuh/config')
+  async saveWazuhConfig(@Body() body: any) {
+    return this.integrationsService.saveWazuhConfig(body);
+  }
+
   @Post('wazuh/test')
   async testWazuh(@Body() body: any) {
     return this.integrationsService.testWazuh(body.apiUrl, body.user, body.password);

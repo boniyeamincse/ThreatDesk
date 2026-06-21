@@ -32,7 +32,7 @@ export default function SettingsPage() {
   const [newKeyName, setNewKeyName] = useState('');
 
   // Users state
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [newUserName, setNewUserName] = useState('');
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserRole, setNewUserRole] = useState('L1 Analyst');
