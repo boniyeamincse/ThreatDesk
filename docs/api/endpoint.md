@@ -948,6 +948,182 @@ Create incident from alert (links alert to new incident).
 
 ---
 
+## Tickets API
+
+### Ticket CRUD
+
+#### GET /tickets
+List tickets with filtering and pagination.
+
+**Query Parameters:**
+- `skip` (optional): Offset for pagination (default: 0)
+- `take` (optional): Limit results (default: 20)
+- `status` (optional): Filter by status
+- `severity` (optional): Filter by severity
+
+**Response:**
+```json
+{
+  "tickets": [
+    {
+      "id": "uuid",
+      "ticketCode": "TKT-001",
+      "title": "System Access Issue",
+      "description": "User unable to access finance system",
+      "severity": "high",
+      "status": "open",
+      "ownerId": "uuid",
+      "dueTime": "2024-01-16T18:00:00Z",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "alert": {...},
+      "comments": [...]
+    }
+  ],
+  "total": 45,
+  "page": 0,
+  "limit": 20
+}
+```
+
+#### POST /tickets
+Create ticket.
+
+**Request Body:**
+```json
+{
+  "title": "Ticket title",
+  "description": "Detailed description",
+  "severity": "high",
+  "status": "open",
+  "assignedTeam": "IT Support",
+  "ownerId": "user-id (optional)",
+  "dueTime": "2024-01-16T18:00:00Z (optional)",
+  "alertId": "alert-id (optional)",
+  "incidentId": "incident-id (optional)"
+}
+```
+
+#### GET /tickets/:id
+Get ticket with comments and related alert.
+
+**Response:** Full ticket object
+
+#### PATCH /tickets/:id
+Update ticket fields.
+
+**Request Body:**
+```json
+{
+  "title": "Updated title",
+  "description": "Updated description",
+  "severity": "critical",
+  "assignedTeam": "Security Team",
+  "ownerId": "user-id",
+  "dueTime": "2024-01-17T18:00:00Z"
+}
+```
+
+#### DELETE /tickets/:id
+Delete ticket and comments.
+
+---
+
+### Ticket Workflow
+
+#### PATCH /tickets/:id/status
+Update ticket status.
+
+**Request Body:**
+```json
+{
+  "status": "in_progress"
+}
+```
+
+**Valid statuses:** open, assigned, in_progress, waiting_user, waiting_it, resolved, closed, reopened
+
+#### POST /tickets/:id/assign
+Assign ticket to owner.
+
+**Request Body:**
+```json
+{
+  "ownerId": "user-id"
+}
+```
+
+#### POST /tickets/:id/escalate
+Escalate ticket severity by one level.
+
+**Request Body:**
+```json
+{
+  "reason": "User reports data loss (optional)"
+}
+```
+
+**Severity progression:** low → medium → high → critical
+
+#### POST /tickets/:id/resolve
+Mark ticket as resolved with notes.
+
+**Request Body:**
+```json
+{
+  "resolutionNotes": "Issue resolved by resetting password"
+}
+```
+
+#### POST /tickets/:id/close
+Close ticket.
+
+#### POST /tickets/:id/reopen
+Reopen closed ticket.
+
+---
+
+### Ticket Comments
+
+#### GET /tickets/:id/comments
+Get all comments for ticket.
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "content": "Issue under investigation",
+    "author": "john@example.com",
+    "createdAt": "2024-01-15T10:30:00Z"
+  }
+]
+```
+
+#### POST /tickets/:id/comments
+Add comment to ticket.
+
+**Request Body:**
+```json
+{
+  "content": "Awaiting user feedback on issue"
+}
+```
+
+#### PUT /tickets/:id/comments/:commentId
+Edit comment.
+
+**Request Body:**
+```json
+{
+  "content": "Updated comment content"
+}
+```
+
+#### DELETE /tickets/:id/comments/:commentId
+Delete comment.
+
+---
+
 ## Dashboard API
 
 ### GET /dashboard/summary
