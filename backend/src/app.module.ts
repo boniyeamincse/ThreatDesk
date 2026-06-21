@@ -12,6 +12,7 @@ import { ReportsModule } from './modules/reports/reports.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { LogSourcesModule } from './modules/log-sources/log-sources.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     AuditLogsModule,
     LogSourcesModule,
     NotificationsModule,
+    WebsocketModule,
   ],
 })
 export class AppModule {}
