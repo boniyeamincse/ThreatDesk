@@ -1124,6 +1124,225 @@ Delete comment.
 
 ---
 
+## Reports API
+
+### Time-Based Reports
+
+#### GET /reports/daily
+Daily report with metrics.
+
+**Query Parameters:**
+- `date` (optional): ISO date (2024-01-15)
+
+**Response:**
+```json
+{
+  "date": "2024-01-15",
+  "alerts": 42,
+  "incidents": 3,
+  "tickets": 15,
+  "truePositives": 28,
+  "falsePositives": 12,
+  "accuracy": "66.67"
+}
+```
+
+#### GET /reports/weekly
+Weekly report with daily averages.
+
+**Query Parameters:**
+- `weeks` (optional): Number of weeks (default: 1)
+
+**Response:**
+```json
+{
+  "startDate": "2024-01-08",
+  "daysIncluded": 7,
+  "alerts": 294,
+  "incidents": 21,
+  "tickets": 105,
+  "truePositives": 196,
+  "falsePositives": 84,
+  "accuracy": "66.67",
+  "dailyAverage": {
+    "alerts": 42,
+    "incidents": 3,
+    "tickets": 15
+  }
+}
+```
+
+#### GET /reports/monthly
+Monthly report with aggregated metrics.
+
+**Query Parameters:**
+- `months` (optional): Number of months (default: 1)
+
+---
+
+### Summary Reports
+
+#### GET /reports/alerts-summary
+Breakdown of all alerts by status, severity, source, verdict.
+
+**Response:**
+```json
+{
+  "summary": {
+    "newAlerts": 25,
+    "inProgress": 8,
+    "escalated": 3,
+    "closed": 150
+  },
+  "byStatus": [
+    { "name": "new", "count": 25 },
+    { "name": "in_progress", "count": 8 }
+  ],
+  "bySeverity": [
+    { "name": "critical", "count": 5 },
+    { "name": "high", "count": 15 }
+  ],
+  "bySource": [
+    { "name": "wazuh", "count": 150 }
+  ],
+  "byVerdict": [
+    { "name": "unclassified", "count": 100 }
+  ]
+}
+```
+
+#### GET /reports/incidents-summary
+Current incident status breakdown.
+
+**Response:**
+```json
+{
+  "open": 5,
+  "investigating": 2,
+  "contained": 1,
+  "remediated": 3,
+  "recovered": 1,
+  "closed": 48,
+  "total": 60
+}
+```
+
+#### GET /reports/tickets-summary
+Ticket status metrics.
+
+**Response:**
+```json
+{
+  "open": 12,
+  "assigned": 8,
+  "inProgress": 5,
+  "resolved": 20,
+  "closed": 145,
+  "total": 190
+}
+```
+
+---
+
+### Performance Reports
+
+#### GET /reports/sla
+SLA compliance and breach tracking.
+
+**Response:**
+```json
+{
+  "breachCount": 5,
+  "totalEscalated": 50,
+  "breachRate": "10.00",
+  "recentBreaches": [...]
+}
+```
+
+#### GET /reports/analyst-performance
+Per-analyst metrics.
+
+**Response:**
+```json
+[
+  {
+    "userId": "uuid",
+    "analyst": "John Doe",
+    "email": "john@example.com",
+    "alertsAssigned": 42,
+    "alertsClosed": 35,
+    "closureRate": "83.33"
+  }
+]
+```
+
+#### GET /reports/true-positive
+True positive rate and trending.
+
+**Response:**
+```json
+{
+  "count": 150,
+  "percentage": "42.86",
+  "recentAlerts": [...]
+}
+```
+
+#### GET /reports/false-positive
+False positive rate analysis.
+
+**Response:**
+```json
+{
+  "count": 85,
+  "percentage": "24.29",
+  "recentAlerts": [...]
+}
+```
+
+#### GET /reports/noisy-rules
+Top alert-generating rules (rule tuning candidates).
+
+**Response:**
+```json
+[
+  {
+    "ruleId": "rule-123",
+    "count": 456,
+    "percentage": "45.60"
+  }
+]
+```
+
+---
+
+### Export Functionality
+
+#### GET /reports/daily/export/pdf
+Export daily report as PDF.
+
+**Query Parameters:**
+- `date` (optional): Target date
+
+**Response:** PDF file download
+
+#### GET /reports/daily/export/excel
+Export daily report as Excel.
+
+#### GET /reports/daily/export/csv
+Export daily report as CSV.
+
+#### GET /reports/alerts/export/pdf
+Export alerts summary as PDF.
+
+#### GET /reports/alerts/export/excel
+Export alerts summary as Excel.
+
+#### GET /reports/alerts/export/csv
+Export alerts summary as CSV.
+
+---
+
 ## Dashboard API
 
 ### GET /dashboard/summary
