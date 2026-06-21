@@ -1,0 +1,797 @@
+Main Goal
+
+Build one web-based SOC management platform where alerts from different security tools are collected, normalized, assigned, triaged, escalated, tracked, and reported.
+
+Tools/log sources:
+
+Wazuh
+Trend Micro Deep Security
+Firewall
+EDR/XDR
+Email security
+Proxy/DNS
+Windows/Linux logs
+Custom API sources
+
+The system will help:
+
+SOC L1 review and classify alerts.
+SOC L2 perform deeper investigation and remediation.
+SOC Engineers improve alert quality and detection rules.
+SOC Manager monitor SLA, analyst performance, true positive rate, false positive rate, and missed threats.
+Core Modules
+1. Alert Dashboard
+
+This is the main SOC working board.
+
+Alert statuses:
+
+New
+In Progress
+Escalated to L2
+True Positive
+False Positive
+Closed
+Archived
+
+Dashboard cards:
+
+New Alerts: 25
+In Progress: 8
+Escalated to L2: 4
+True Positive: 6
+False Positive: 12
+Closed Today: 18
+Critical Alerts: 3
+SLA Breached: 2
+
+Table fields:
+
+Field	Description
+Alert Time	When alert was created
+Event Time	When actual event happened
+Alert Name	Detection rule name
+Severity	Low, Medium, High, Critical
+Status	New, In Progress, Closed
+Verdict	True Positive, False Positive, Benign, Suspicious
+Assignee	L1/L2 analyst
+Source	Wazuh, Deep Security, Firewall, etc.
+Asset	Hostname/IP/User
+MITRE Tactic	Initial Access, Discovery, Execution, etc.
+SLA Timer	Time left before breach
+Actions	Assign, escalate, close, archive
+2. Alert Triage Page
+
+When an analyst opens an alert, they should see all required triage information.
+
+Alert Details
+Alert Name: Spike of Domain Discovery Commands
+Severity: Medium
+Source: Wazuh
+Status: New
+Verdict: Not Classified
+Alert Time: 2025-03-27 19:56
+Event Time: 2025-03-27 19:54
+Affected Host: PC-FINANCE-21
+User: jsmith
+Source IP: 10.10.20.45
+Destination IP: 8.8.8.8
+Command Line: nslookup, whoami, net view
+Rule ID: 5712
+MITRE: Discovery / T1087
+Triage Checklist
+
+For L1 analysts:
+
+[ ] Is the alert duplicate?
+[ ] Is the asset critical?
+[ ] Is the user behavior expected?
+[ ] Is there known maintenance activity?
+[ ] Is the IP/domain malicious?
+[ ] Are there related alerts?
+[ ] Is escalation required?
+Analyst Actions
+
+Buttons:
+
+Assign to Me
+Mark In Progress
+Add Comment
+Request More Info
+Escalate to L2
+Mark True Positive
+Mark False Positive
+Close Alert
+Archive
+Create Ticket
+3. Alert Prioritization Logic
+
+The system should automatically sort alerts using the SOC method you described.
+
+Priority logic:
+
+1. Show only New/Unassigned alerts.
+2. Sort by Severity:
+   Critical > High > Medium > Low
+3. Sort by Oldest Alert Time first.
+4. Boost alerts involving critical assets.
+5. Boost alerts with known malicious IOC.
+6. Boost alerts with multiple correlated events.
+
+Example scoring:
+
+Critical = 100 points
+High = 75 points
+Medium = 50 points
+Low = 25 points
+
+Critical asset = +30
+Known malicious IOC = +40
+Multiple related alerts = +20
+Old alert over SLA = +25
+
+Final priority score:
+
+Alert Priority Score = Severity Score + Asset Score + IOC Score + Correlation Score + SLA Score
+4. Role-Based Access Control
+SOC L1 Analyst
+
+Permissions:
+
+View new alerts
+Assign alert to self
+Start triage
+Add comments
+Mark false positive
+Escalate true/suspicious alerts to L2
+Close low-risk false positives
+
+Cannot:
+
+Delete alerts
+Change detection rules
+Manage users
+Modify integrations
+SOC L2 Analyst
+
+Permissions:
+
+Receive escalated alerts
+Perform deeper investigation
+Add remediation steps
+Mark true positive
+Create incident case
+Recommend blocking IOC
+Close escalated cases
+SOC Engineer
+
+Permissions:
+
+Review alert quality
+Tune rules
+Manage parser mappings
+Configure integrations
+Create suppression rules
+Improve detection logic
+SOC Manager
+
+Permissions:
+
+View all dashboards
+Track analyst performance
+Track SLA
+Track MTTA/MTTR
+View reports
+Export data
+Assign workload
+Review quality metrics
+Admin
+
+Permissions:
+
+Manage users
+Manage roles
+Manage API integrations
+Configure system settings
+Backup/restore
+Audit logs
+5. Escalation Workflow
+
+Basic workflow:
+
+New Alert
+   ↓
+Assigned to L1
+   ↓
+In Progress
+   ↓
+L1 Investigation
+   ↓
+False Positive → Close
+   ↓
+Suspicious / Real Threat
+   ↓
+Escalate to L2
+   ↓
+L2 Deep Analysis
+   ↓
+True Positive
+   ↓
+Create Incident / Ticket
+   ↓
+Remediation
+   ↓
+Closed
+   ↓
+Archived
+
+Escalation fields:
+
+Escalated By
+Escalated To
+Escalation Time
+Reason for Escalation
+L1 Summary
+Evidence
+Recommended Action
+L2 Notes
+Final Verdict
+Remediation Status
+6. Automatic Ticket Management
+
+The system can automatically create tickets when:
+
+Alert is marked True Positive
+Alert severity is Critical
+L1 escalates to L2
+SLA is breached
+Same host has repeated suspicious alerts
+IOC is confirmed malicious
+
+Ticket fields:
+
+Ticket ID
+Alert ID
+Incident Title
+Severity
+Assigned Team
+Status
+Created Time
+Due Time
+Affected Asset
+Business Impact
+Recommended Action
+Remediation Owner
+Resolution Notes
+
+Ticket statuses:
+
+Open
+Assigned
+In Progress
+Waiting for User
+Waiting for IT
+Resolved
+Closed
+Reopened
+7. Integrations
+Wazuh Integration
+
+Use Wazuh API to collect:
+
+Alerts
+Agents
+Rule IDs
+MITRE mappings
+File integrity alerts
+Vulnerability alerts
+Active response events
+
+Example data:
+
+source = wazuh
+rule_id = 5712
+agent_name = web-server-01
+agent_ip = 10.10.10.20
+severity = high
+description = SSH brute force attack
+Trend Micro Deep Security Integration
+
+Collect:
+
+Malware events
+IPS events
+Firewall events
+Integrity monitoring events
+Log inspection events
+Application control alerts
+Firewall Integration
+
+Collect from:
+
+Fortigate
+Palo Alto
+Sophos
+Cisco ASA
+MikroTik
+pfSense
+
+Fields:
+
+source_ip
+destination_ip
+destination_port
+protocol
+action
+policy_id
+threat_name
+url
+country
+bytes_sent
+bytes_received
+Email Security Integration
+
+Collect:
+
+phishing alerts
+malicious attachments
+blocked URLs
+sender reputation
+recipient user
+message ID
+8. Normalized Alert Schema
+
+All sources should be converted into one common alert format.
+
+{
+  "alert_id": "ALT-2025-000001",
+  "source": "wazuh",
+  "alert_time": "2025-03-27T19:56:00",
+  "event_time": "2025-03-27T19:54:00",
+  "name": "Spike of Domain Discovery Commands",
+  "severity": "medium",
+  "status": "new",
+  "verdict": "unclassified",
+  "assignee": null,
+  "asset": {
+    "hostname": "PC-FINANCE-21",
+    "ip": "10.10.20.45",
+    "criticality": "high"
+  },
+  "user": {
+    "username": "jsmith",
+    "department": "Finance"
+  },
+  "network": {
+    "source_ip": "10.10.20.45",
+    "destination_ip": "8.8.8.8",
+    "destination_port": 53,
+    "protocol": "DNS"
+  },
+  "mitre": {
+    "tactic": "Discovery",
+    "technique": "T1087"
+  },
+  "raw_event": {},
+  "comments": [],
+  "timeline": []
+}
+9. Suggested JavaScript Technology Stack
+Frontend
+
+Use:
+
+React.js / Next.js
+Tailwind CSS
+shadcn/ui
+TanStack Table
+Recharts / ApexCharts
+Socket.io client
+
+Frontend pages:
+
+/login
+/dashboard
+/alerts
+/alerts/:id
+/kanban
+/incidents
+/tickets
+/assets
+/integrations
+/reports
+/users
+/settings
+Backend
+
+Use:
+
+Node.js
+Express.js or NestJS
+Prisma ORM
+Socket.io
+BullMQ for background jobs
+JWT authentication
+Role-based authorization
+Database
+
+Recommended:
+
+PostgreSQL
+Redis
+Elasticsearch or OpenSearch
+
+Use PostgreSQL for:
+
+users
+roles
+alerts
+tickets
+comments
+workflow
+SLA
+audit logs
+
+Use Elasticsearch/OpenSearch for:
+
+raw logs
+large event search
+IOC search
+historical alert queries
+
+Use Redis for:
+
+queues
+caching
+real-time alert counters
+background job state
+10. High-Level Architecture
+Security Tools
+   |
+   | API / Syslog / Webhook
+   ↓
+Collector Service
+   |
+   ↓
+Parser + Normalizer
+   |
+   ↓
+Correlation Engine
+   |
+   ↓
+Alert Database
+   |
+   ↓
+SOC Management Backend API
+   |
+   ↓
+React Dashboard
+
+Detailed flow:
+
+Wazuh API
+Deep Security API
+Firewall Syslog
+Email Gateway API
+Windows/Linux Logs
+        ↓
+Integration Connectors
+        ↓
+Normalization Engine
+        ↓
+Deduplication Engine
+        ↓
+Severity & Priority Engine
+        ↓
+Alert Queue
+        ↓
+SOC Dashboard
+        ↓
+Triage / Escalation / Ticket
+11. Database Tables
+
+Minimum tables:
+
+users
+roles
+permissions
+alerts
+alert_events
+alert_comments
+alert_assignments
+alert_timeline
+tickets
+incidents
+assets
+integrations
+sla_policies
+iocs
+watchlists
+audit_logs
+notification_rules
+
+Example alerts table:
+
+CREATE TABLE alerts (
+    id UUID PRIMARY KEY,
+    alert_code VARCHAR(50) UNIQUE,
+    source VARCHAR(100),
+    name VARCHAR(255),
+    description TEXT,
+    severity VARCHAR(20),
+    status VARCHAR(50),
+    verdict VARCHAR(50),
+    priority_score INT,
+    alert_time TIMESTAMP,
+    event_time TIMESTAMP,
+    assignee_id UUID,
+    asset_id UUID,
+    raw_event JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+Example alert_comments table:
+
+CREATE TABLE alert_comments (
+    id UUID PRIMARY KEY,
+    alert_id UUID,
+    user_id UUID,
+    comment TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+Example tickets table:
+
+CREATE TABLE tickets (
+    id UUID PRIMARY KEY,
+    ticket_code VARCHAR(50) UNIQUE,
+    alert_id UUID,
+    title VARCHAR(255),
+    severity VARCHAR(20),
+    status VARCHAR(50),
+    assigned_team VARCHAR(100),
+    owner_id UUID,
+    due_time TIMESTAMP,
+    resolution_notes TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+12. API Design
+Alert APIs
+GET    /api/alerts
+GET    /api/alerts/:id
+POST   /api/alerts
+PATCH  /api/alerts/:id/status
+PATCH  /api/alerts/:id/assign
+PATCH  /api/alerts/:id/verdict
+POST   /api/alerts/:id/comments
+POST   /api/alerts/:id/escalate
+POST   /api/alerts/:id/close
+POST   /api/alerts/:id/archive
+Dashboard APIs
+GET /api/dashboard/summary
+GET /api/dashboard/severity-count
+GET /api/dashboard/status-count
+GET /api/dashboard/verdict-count
+GET /api/dashboard/sla-breaches
+GET /api/dashboard/analyst-performance
+Ticket APIs
+GET    /api/tickets
+GET    /api/tickets/:id
+POST   /api/tickets
+PATCH  /api/tickets/:id/status
+PATCH  /api/tickets/:id/assign
+POST   /api/tickets/:id/comments
+Integration APIs
+GET  /api/integrations
+POST /api/integrations/wazuh/test
+POST /api/integrations/wazuh/sync
+POST /api/integrations/deep-security/test
+POST /api/integrations/firewall/syslog
+13. SOC Manager Dashboard
+
+Important metrics:
+
+MTTA: Mean Time To Acknowledge
+MTTR: Mean Time To Resolve
+True Positive Rate
+False Positive Rate
+Escalation Rate
+Alerts Closed Per Analyst
+SLA Breach Count
+Critical Alerts Pending
+Top Noisy Rules
+Top Affected Assets
+Top Alert Sources
+
+Charts:
+
+Alerts by Severity
+Alerts by Status
+Alerts by Source
+Alerts by Verdict
+Alerts Over Time
+Analyst Workload
+SLA Breach Trend
+Top 10 Alert Rules
+Top 10 Affected Hosts
+14. SOC Engineer Dashboard
+
+This dashboard helps improve alert quality.
+
+Show:
+
+Noisy Rules
+Rules with High False Positive Rate
+Rules Missing MITRE Mapping
+Rules Missing Triage Instructions
+Rules Without Asset Context
+Rules Without Required Fields
+Duplicate Alert Patterns
+Suppression Candidate Alerts
+
+Useful action:
+
+Recommend Rule Tuning
+Add Triage Guide
+Add Required Fields
+Create Suppression Rule
+Map to MITRE ATT&CK
+Change Severity
+15. Alert Quality Score
+
+Each alert should have a quality score.
+
+Example:
+
+Has affected host: +20
+Has user: +15
+Has source IP: +15
+Has destination IP: +15
+Has command line/process: +20
+Has MITRE mapping: +10
+Has triage guide: +10
+
+Result:
+
+Alert Quality Score: 85/100
+
+This helps SOC engineers improve bad alerts.
+
+16. Notification System
+
+Notify analysts through:
+
+Email
+Microsoft Teams
+Telegram
+Slack
+Dashboard popup
+Browser notification
+
+Notification triggers:
+
+Critical alert created
+Alert assigned
+Alert escalated
+SLA near breach
+Ticket created
+L2 requested update
+Manager review needed
+17. MVP Development Plan
+Phase 1: Basic SOC Alert Board
+
+Build first:
+
+Login
+User roles
+Alert list
+Alert details
+Assign to me
+Change status
+Add comments
+Set verdict
+Close alert
+Basic dashboard
+Phase 2: Escalation and Tickets
+
+Add:
+
+Escalate to L2
+Create ticket
+Ticket status
+SLA timer
+Alert timeline
+Email notification
+Phase 3: Integrations
+
+Add:
+
+Wazuh API connector
+Deep Security connector
+Firewall syslog receiver
+Manual alert import
+Alert normalization
+Phase 4: Manager Reporting
+
+Add:
+
+MTTA
+MTTR
+Analyst performance
+SLA reports
+False positive reports
+Export PDF/Excel
+Phase 5: Advanced Features
+
+Add:
+
+Correlation engine
+IOC enrichment
+VirusTotal/AbuseIPDB integration
+MITRE mapping
+Alert quality score
+Rule tuning recommendations
+
+
+
+
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── modules/
+│   │   │   ├── auth/
+│   │   │   ├── users/
+│   │   │   ├── alerts/
+│   │   │   ├── tickets/
+│   │   │   ├── incidents/
+│   │   │   ├── integrations/
+│   │   │   ├── dashboard/
+│   │   │   ├── reports/
+│   │   │   └── notifications/
+│   │   ├── jobs/
+│   │   ├── queues/
+│   │   ├── middleware/
+│   │   ├── utils/
+│   │   └── main.ts
+│   ├── prisma/
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   ├── components/
+│   │   ├── features/
+│   │   │   ├── alerts/
+│   │   │   ├── dashboard/
+│   │   │   ├── tickets/
+│   │   │   ├── users/
+│   │   │   └── integrations/
+│   │   ├── hooks/
+│   │   ├── lib/
+│   │   └── styles/
+│   └── package.json
+├── docs/
+│   ├── architecture.md
+│   ├── api-design.md
+│   ├── database.md
+│   └── soc-workflow.md
+│
+└── README.md
+
+Best MVP Recommendation
+
+Start with this first version:
+
+1. React/Next.js frontend
+2. Node.js/NestJS backend
+3. PostgreSQL database
+4. JWT login
+5. Role-based access
+6. Alert dashboard
+7. Alert triage page
+8. Assign/escalate/close workflow
+9. Ticket creation
+10. Wazuh API integration
+│
