@@ -1536,6 +1536,169 @@ Most frequently triggered rules.
 
 ---
 
+## Audit Logs API
+
+#### GET /audit-logs
+List audit logs with filtering and pagination.
+
+**Query Parameters:**
+- `skip` (optional): Offset (default: 0)
+- `take` (optional): Limit (default: 20)
+- `userId` (optional): Filter by user
+- `action` (optional): Filter by action type
+- `resource` (optional): Filter by resource
+
+**Response:**
+```json
+{
+  "logs": [
+    {
+      "id": "uuid",
+      "userId": "uuid",
+      "action": "alert.assigned",
+      "resource": "alert-id",
+      "changes": {...},
+      "createdAt": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "total": 1250,
+  "page": 0,
+  "limit": 20
+}
+```
+
+#### GET /audit-logs/:id
+Get single audit log entry.
+
+#### GET /audit-logs/user/:userId
+Get all logs for user.
+
+#### GET /audit-logs/resource/:resource
+Get all logs for resource.
+
+**Common Actions:**
+- user.login
+- user.logout
+- alert.assigned
+- alert.escalated
+- alert.closed
+- verdict.changed
+- ticket.created
+- incident.created
+- api_key.created
+- api_key.deleted
+
+---
+
+## Log Sources API
+
+#### GET /log-sources
+List all log sources.
+
+**Response:**
+```json
+{
+  "sources": [
+    {
+      "id": "uuid",
+      "name": "Wazuh Manager",
+      "type": "wazuh",
+      "status": "active",
+      "config": { "apiUrl": "...", "user": "..." },
+      "lastSyncAt": "2024-01-15T10:30:00Z",
+      "lastError": null,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "total": 5,
+  "limit": 20
+}
+```
+
+#### GET /log-sources/:id
+Get source details.
+
+#### POST /log-sources
+Add log source.
+
+**Request Body:**
+```json
+{
+  "name": "Wazuh Manager",
+  "type": "wazuh",
+  "config": {
+    "apiUrl": "https://wazuh.example.com",
+    "user": "admin",
+    "password": "secret"
+  }
+}
+```
+
+#### PATCH /log-sources/:id
+Update source.
+
+**Request Body:**
+```json
+{
+  "name": "Updated Name",
+  "config": {...}
+}
+```
+
+#### DELETE /log-sources/:id
+Remove source.
+
+#### POST /log-sources/:id/test-connection
+Verify connection to source.
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Wazuh connection test passed"
+}
+```
+
+#### GET /log-sources/:id/health
+Get source health status.
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "name": "Wazuh Manager",
+  "type": "wazuh",
+  "status": "active",
+  "lastSyncAt": "2024-01-15T10:30:00Z",
+  "lastError": null,
+  "alertCount": 1250,
+  "healthy": true
+}
+```
+
+#### POST /log-sources/:id/sync
+Trigger manual sync (queues background job).
+
+**Response:**
+```json
+{
+  "message": "Sync job queued",
+  "sourceId": "uuid"
+}
+```
+
+**Supported Sources:**
+- wazuh
+- deep-security
+- firewall
+- windows-logs
+- syslog
+- email-security
+- proxy-dns
+- custom-api
+
+---
+
 ## Users & Roles API
 
 ### User Management
