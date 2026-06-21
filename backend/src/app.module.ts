@@ -8,6 +8,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { SettingsModule } from './modules/settings/settings.module';
+import { ReportsModule } from './modules/reports/reports.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SettingsModule } from './modules/settings/settings.module';
     TicketsModule,
     IntegrationsModule,
     SettingsModule,
+    ReportsModule,
   ],
 })
 export class AppModule {}
