@@ -11,6 +11,7 @@ import { SettingsModule } from './modules/settings/settings.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { LogSourcesModule } from './modules/log-sources/log-sources.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { LogSourcesModule } from './modules/log-sources/log-sources.module';
     ReportsModule,
     AuditLogsModule,
     LogSourcesModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}
