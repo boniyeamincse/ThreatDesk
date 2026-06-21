@@ -9,6 +9,8 @@ import { TicketsModule } from './modules/tickets/tickets.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
+import { LogSourcesModule } from './modules/log-sources/log-sources.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { ReportsModule } from './modules/reports/reports.module';
     IntegrationsModule,
     SettingsModule,
     ReportsModule,
+    AuditLogsModule,
+    LogSourcesModule,
   ],
 })
 export class AppModule {}
